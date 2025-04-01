@@ -57,6 +57,12 @@ ${servicos.map(s => `${s.nome} - ${s.valor} (${s.tempo || 'Tempo variável'})`).
         return client.sendMessage(chatId, 'Agendamento cancelado. Se precisar de algo, só chamar!');
     }
 
+    if (msg.body.toLowerCase() === 'voltar' && etapa > 0) {
+        agendamentos[chatId].etapa--;
+        client.sendMessage(chatId, 'Você voltou à etapa anterior. Faça uma nova escolha.');
+        return;
+    }
+
     switch (etapa) {
         case 0:
             client.sendMessage(chatId, `Olá! Seja bem-vinda ao Sabrina Fiorese Studio de Beleza! Escolha uma opção:
@@ -72,7 +78,8 @@ ${servicos.map(s => `${s.nome} - ${s.valor} (${s.tempo || 'Tempo variável'})`).
                 delete agendamentos[chatId];
             } else if (msg.body === '1') {
                 client.sendMessage(chatId, `Escolha a categoria da profissional:
-${Object.keys(profissionais).map((p, i) => `${i + 1} - ${p}`).join('\n')}`);
+${Object.keys(profissionais).map((p, i) => `${i + 1} - ${p}`).join('\n')}
+Digite "Voltar" para retornar.`);
                 agendamentos[chatId].etapa = 2;
             } else {
                 client.sendMessage(chatId, 'Escolha inválida. Tente novamente.');
@@ -89,7 +96,8 @@ ${Object.keys(profissionais).map((p, i) => `${i + 1} - ${p}`).join('\n')}`);
                     delete agendamentos[chatId];
                 } else {
                     client.sendMessage(chatId, `Ótimo! Escolha a profissional:
-${profissionais[categorias[categoriaIndex]].map((p, i) => `${i + 1} - ${p}`).join('\n')}`);
+${profissionais[categorias[categoriaIndex]].map((p, i) => `${i + 1} - ${p}`).join('\n')}
+Digite "Voltar" para retornar.`);
                     agendamentos[chatId].etapa = 3;
                 }
             } else {
@@ -103,7 +111,8 @@ ${profissionais[categorias[categoriaIndex]].map((p, i) => `${i + 1} - ${p}`).joi
             if (profIndex >= 0 && profIndex < listaProfissionais.length) {
                 agendamentos[chatId].profissional = listaProfissionais[profIndex];
                 client.sendMessage(chatId, `Escolha o serviço:
-${servicos.map((s, i) => `${i + 1} - ${s.nome} (${s.valor}, ${s.tempo})`).join('\n')}`);
+${servicos.map((s, i) => `${i + 1} - ${s.nome} (${s.valor}, ${s.tempo})`).join('\n')}
+Digite "Voltar" para retornar.`);
                 agendamentos[chatId].etapa = 4;
             } else {
                 client.sendMessage(chatId, 'Escolha inválida. Tente novamente.');
