@@ -1,10 +1,9 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal'); // Adicionar a importação do QR Code
+const qrcode = require('qrcode-terminal');
 
 const client = new Client({
     authStrategy: new LocalAuth()
 });
-
 
 // Profissionais e serviços disponíveis
 const profissionais = {
@@ -15,25 +14,25 @@ const profissionais = {
 
 const servicos = {
     "Designer de sobrancelha": [
-
-        { nome: 'Designer de sobrancelha', valor: 'R$ 38,00', tempo: '30 min' },
-        { nome: 'Designer de sobrancelha + buço', valor: 'R$ 48,00', tempo: '30 min' },
-        { nome: 'Designer de sobrancelha com coloração ou henna', valor: 'R$ 48,00', tempo: '40 min' },
-        { nome: 'Designer de sobrancelha com coloração ou henna + buço', valor: 'R$ 58,00', tempo: '40 min' },
+        
+        { nome: 'Designer de sobrancelha', valor: 'R$ 38,00' },
+        { nome: 'Designer de sobrancelha + buço', valor: 'R$ 48,00'},
+        { nome: 'Designer de sobrancelha com coloração ou henna', valor: 'R$ 48,00'},
+        { nome: 'Designer de sobrancelha com coloração ou henna + buço', valor: 'R$ 58,00'},
         { nome: 'Buço', valor: 'R$ 18,00' },
-        { nome: 'Brow lamination', valor: 'R$ 120,00', tempo: '1h' },
-        { nome: 'Lifting de cílios', valor: 'R$ 130,00', tempo: '1h30' },
+        { nome: 'Brow lamination', valor: 'R$ 120,00'},
+        { nome: 'Lifting de cílios', valor: 'R$ 130,00'},
         { nome: 'Reconstrução de Sobrancelha', valor: 'Consultar' }
     ],
     "Produção maquiagem e penteado": [
 
-        { nome: 'Maquiagem eventos (madrinhas, formandas)', valor: 'R$ 170,00', tempo: '50 min' },
-        { nome: 'Maquiagem para fotos (segunda a sexta)', valor: 'R$ 130,00', tempo: '45 min' },
-        { nome: 'Penteado', valor: 'R$ 100,00 a R$ 150,00', tempo: '1h' }
+        { nome: 'Maquiagem eventos (madrinhas, formandas)', valor: 'R$ 170,00'},
+        { nome: 'Maquiagem para fotos (segunda a sexta)', valor: 'R$ 130,00'},
+        { nome: 'Penteado', valor: 'R$ 100,00 a R$ 150,00'}
     ],
     "Serviços Especiais": [
-
-        { nome: 'Depilação a Laser', valor: 'a partir de R$ 80,00', tempo: '20 min (combos e áreas a consultar)' },
+        
+        { nome: 'Depilação a Laser', valor: 'a partir de R$ 80,00 (combos e áreas a consultar)'},
         { nome: 'Pacotes de noiva', valor: 'Consultar' }
     ]
 };
@@ -54,7 +53,7 @@ client.on('message', async msg => {
     if (msg.body.toLowerCase() === 'serviços') {
         client.sendMessage(chatId, `Aqui estão nossos serviços disponíveis:
 ${Object.keys(servicos).map(categoria => {
-            return `\n${categoria}:\n${servicos[categoria].map(s => `${s.nome} - ${s.valor} (${s.tempo || 'Tempo variável'})`).join('\n')}`; 
+            return `\n${categoria}:\n${servicos[categoria].map(s => `${s.nome} - ${s.valor} (${s.tempo || 'Tempo variável'})`).join('\n')}`;
         }).join('\n')}`);
         return;
     }
@@ -67,7 +66,7 @@ ${Object.keys(servicos).map(categoria => {
     if (!agendamentos[chatId]) {
         agendamentos[chatId] = { etapa: 0 };
     }
-    
+
     const etapa = agendamentos[chatId].etapa;
 
     if (msg.body.toLowerCase() === 'cancelar') {
@@ -76,7 +75,8 @@ ${Object.keys(servicos).map(categoria => {
     }
 
     if (msg.body.toLowerCase() === 'remarcar' || msg.body.toLowerCase() === 'consultar agendamento') {
-        client.sendMessage(chatId, 'Para remarcar ou consultar seu agendamento, aguarde que entraremos em contato:');
+        client.sendMessage(chatId, 'Para remarcar ou consultar seu agendamento, aguarde que entraremos em contato.');
+        return;
     }
 
     switch (etapa) {
@@ -91,50 +91,77 @@ Escolha uma opção:
             break;
 
         case 1:
-    if (msg.body === '2') {
-        client.sendMessage(chatId, `Aqui estão nossos serviços disponíveis:
+            if (msg.body === '2') {
+                client.sendMessage(chatId, `Aqui estão nossos serviços disponíveis:
 ${Object.keys(servicos).map(categoria => {
-            return `\n${categoria}:\n${servicos[categoria].map(s => `${s.nome} - ${s.valor} (${s.tempo || 'Tempo variável'})`).join('\n')}`; 
-        }).join('\n')}`);
-        delete agendamentos[chatId];
-    } else if (msg.body === '1') {
-        client.sendMessage(chatId, `Escolha a categoria da profissional:
+                    return `\n${categoria}:\n${servicos[categoria].map(s => `${s.nome} - ${s.valor} (${s.tempo || 'Tempo variável'})`).join('\n')}`;
+                }).join('\n')}`);
+                delete agendamentos[chatId];
+            } else if (msg.body === '1') {
+                client.sendMessage(chatId, `Escolha a categoria da profissional:
 ${Object.keys(profissionais).map((p, i) => `${i + 1} - ${p}`).join('\n')}
 Digite "Voltar" para retornar.`);
-        agendamentos[chatId].etapa = 2;
-    } else if (msg.body === '3') {
-        client.sendMessage(chatId, 'Confira nossos produtos no Instagram: https://www.instagram.com/filfioreff/#');
-        delete agendamentos[chatId];
-    } else if (msg.body === '4') {
-        client.sendMessage(chatId, 'Aguarde por gentileza, em breve alguém irá retornar com a disponibilidade disponível.');
-        delete agendamentos[chatId];
-    } else {
-        client.sendMessage(chatId, 'Escolha inválida. Tente novamente.');
-    }
-    break;
+                agendamentos[chatId].etapa = 2;
+            } else if (msg.body === '3') {
+                client.sendMessage(chatId, 'Confira nossos produtos no Instagram: https://www.instagram.com/filfioreff/#');
+                delete agendamentos[chatId];
+            } else if (msg.body === '4') {
+                client.sendMessage(chatId, 'Aguarde por gentileza, em breve alguém irá retornar com a disponibilidade disponível.');
+                delete agendamentos[chatId];
+            } else {
+                client.sendMessage(chatId, 'Escolha inválida. Tente novamente.');
+            }
+            break;
 
-        
         case 2:
             const categoriaIndex = parseInt(msg.body) - 1;
             const categorias = Object.keys(profissionais);
+
             if (categoriaIndex >= 0 && categoriaIndex < categorias.length) {
                 agendamentos[chatId].categoria = categorias[categoriaIndex];
-                if (agendamentos[chatId].categoria === "Manicure") {
-                    client.sendMessage(chatId, "Para agendamentos de manicure, entre em contato diretamente com Arielly pelo WhatsApp: https://wa.me/5528999895626");
+                const profissionaisDisponiveis = profissionais[agendamentos[chatId].categoria];
+
+                if (profissionaisDisponiveis.length === 1) {
+                    encaminharParaProfissional(chatId, profissionaisDisponiveis[0]);
                     delete agendamentos[chatId];
-                } else if (agendamentos[chatId].categoria === "Produção maquiagem e penteado") {
-                    client.sendMessage(chatId, "Para agendamentos de maquiagem e penteado, entre em contato diretamente com Juliana pelo WhatsApp: https://wa.me/5528999551316");
-                    delete agendamentos[chatId];
-                } else if (agendamentos[chatId].categoria === "Designer de sobrancelha" && profissionais["Designer de sobrancelha"].includes("Maíra")) {
-                    client.sendMessage(chatId, "Para agendamentos com Maíra, entre em contato diretamente com ela pelo WhatsApp: https://wa.me/5528999435647");
-                    delete agendamentos[chatId];
-                
                 } else {
-                    client.sendMessage(chatId, 'Escolha inválida. Tente novamente.');
+                    client.sendMessage(chatId, `Escolha a profissional desejada para ${agendamentos[chatId].categoria}:\n` +
+                        profissionaisDisponiveis.map((prof, i) => `${i + 1} - ${prof}`).join('\n') +
+                        `\nDigite o número correspondente.`);
+                    agendamentos[chatId].etapa = 3;
                 }
+            } else {
+                client.sendMessage(chatId, 'Escolha inválida. Tente novamente.');
+            }
+            break;
+
+        case 3:
+            const profissionalIndex = parseInt(msg.body) - 1;
+            const profissionaisEscolhidos = profissionais[agendamentos[chatId].categoria];
+
+            if (profissionalIndex >= 0 && profissionalIndex < profissionaisEscolhidos.length) {
+                encaminharParaProfissional(chatId, profissionaisEscolhidos[profissionalIndex]);
+                delete agendamentos[chatId];
+            } else {
+                client.sendMessage(chatId, 'Escolha inválida. Tente novamente.');
             }
             break;
     }
 });
+
+function encaminharParaProfissional(chatId, profissional) {
+    const contatos = {
+        "Sabrina": "https://wa.me/5528999551316",
+        "Maíra": "https://wa.me/5528999435647",
+        "Juliana": "https://wa.me/5528999551316",
+        "Arielly": "https://wa.me/5528999895626"
+    };
+
+    if (contatos[profissional]) {
+        client.sendMessage(chatId, `Para agendamentos com ${profissional}, entre em contato pelo WhatsApp: ${contatos[profissional]}`);
+    } else {
+        client.sendMessage(chatId, "Profissional não encontrada. Tente novamente.");
+    }
+}
 
 client.initialize();
