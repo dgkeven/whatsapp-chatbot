@@ -14,25 +14,22 @@ const profissionais = {
 
 const servicos = {
     "Designer de sobrancelha": [
-        
         { nome: 'Designer de sobrancelha', valor: 'R$ 38,00' },
-        { nome: 'Designer de sobrancelha + buço', valor: 'R$ 48,00'},
-        { nome: 'Designer de sobrancelha com coloração ou henna', valor: 'R$ 48,00'},
-        { nome: 'Designer de sobrancelha com coloração ou henna + buço', valor: 'R$ 58,00'},
+        { nome: 'Designer de sobrancelha + buço', valor: 'R$ 48,00' },
+        { nome: 'Designer de sobrancelha com coloração ou henna', valor: 'R$ 48,00' },
+        { nome: 'Designer de sobrancelha com coloração ou henna + buço', valor: 'R$ 58,00' },
         { nome: 'Buço', valor: 'R$ 18,00' },
-        { nome: 'Brow lamination', valor: 'R$ 120,00'},
-        { nome: 'Lifting de cílios', valor: 'R$ 130,00'},
+        { nome: 'Brow lamination', valor: 'R$ 120,00' },
+        { nome: 'Lifting de cílios', valor: 'R$ 130,00' },
         { nome: 'Reconstrução de Sobrancelha', valor: 'Consultar' }
     ],
     "Produção maquiagem e penteado": [
-
-        { nome: 'Maquiagem eventos (madrinhas, formandas)', valor: 'R$ 170,00'},
-        { nome: 'Maquiagem para fotos (segunda a sexta)', valor: 'R$ 130,00'},
-        { nome: 'Penteado', valor: 'R$ 100,00 a R$ 150,00'}
+        { nome: 'Maquiagem eventos (madrinhas, formandas)', valor: 'R$ 170,00' },
+        { nome: 'Maquiagem para fotos (segunda a sexta)', valor: 'R$ 130,00' },
+        { nome: 'Penteado', valor: 'R$ 100,00 a R$ 150,00' }
     ],
     "Serviços Especiais": [
-        
-        { nome: 'Depilação a Laser', valor: 'a partir de R$ 80,00 (combos e áreas a consultar)'},
+        { nome: 'Depilação a Laser', valor: 'a partir de R$ 80,00 (combos e áreas a consultar)' },
         { nome: 'Pacotes de noiva', valor: 'Consultar' }
     ]
 };
@@ -51,12 +48,13 @@ client.on('message', async msg => {
     const chatId = msg.from;
 
     if (msg.body.toLowerCase() === 'serviços') {
-        client.sendMessage(chatId, `Aqui estão nossos serviços disponíveis:
-${Object.keys(servicos).map(categoria => {
-            return `\n${categoria}:\n${servicos[categoria].map(s => `${s.nome} - ${s.valor} (${s.tempo || 'Tempo variável'})`).join('\n')}`;
-        }).join('\n')}`);
+        client.sendMessage(chatId, `Aqui estão nossos serviços disponíveis:\n${Object.keys(servicos).map(categoria => {
+            return `\n${categoria}:\n${servicos[categoria].map(s => `${s.nome} - ${s.valor}`).join('\n')}`;
+        }).join('\n')
+            }`);
         return;
     }
+
 
     if (msg.body.toLowerCase() === 'produtos') {
         client.sendMessage(chatId, 'Confira nossos produtos no Instagram: https://www.instagram.com/filfioreff/#');
@@ -81,7 +79,7 @@ ${Object.keys(servicos).map(categoria => {
 
     switch (etapa) {
         case 0:
-            client.sendMessage(chatId, `Olá! Seja bem-vinda ao Sabrina Fiorese Studio de Beleza!
+            client.sendMessage(chatId, `Olá! Seja bem - vinda ao Sabrina Fiorese Studio de Beleza!
 Escolha uma opção:
 1 - Agendar um serviço
 2 - Ver serviços e valores
@@ -93,9 +91,9 @@ Escolha uma opção:
         case 1:
             if (msg.body === '2') {
                 client.sendMessage(chatId, `Aqui estão nossos serviços disponíveis:
-${Object.keys(servicos).map(categoria => {
-                    return `\n${categoria}:\n${servicos[categoria].map(s => `${s.nome} - ${s.valor} (${s.tempo || 'Tempo variável'})`).join('\n')}`;
-                }).join('\n')}`);
+${Object.keys(servicos).map(categoria =>
+                    `\n${categoria}:\n${servicos[categoria].map(s => `${s.nome} - ${s.valor}`).join('\n')}`
+                ).join('\n')}`);
                 delete agendamentos[chatId];
             } else if (msg.body === '1') {
                 client.sendMessage(chatId, `Escolha a categoria da profissional:
@@ -106,7 +104,7 @@ Digite "Voltar" para retornar.`);
                 client.sendMessage(chatId, 'Confira nossos produtos no Instagram: https://www.instagram.com/filfioreff/#');
                 delete agendamentos[chatId];
             } else if (msg.body === '4') {
-                client.sendMessage(chatId, 'Aguarde por gentileza, em breve alguém irá retornar com a disponibilidade disponível.');
+                client.sendMessage(chatId, 'Aguarde por gentileza, em breve alguém irá retornar com a disponibilidade.');
                 delete agendamentos[chatId];
             } else {
                 client.sendMessage(chatId, 'Escolha inválida. Tente novamente.');
@@ -123,7 +121,6 @@ Digite "Voltar" para retornar.`);
 
                 if (profissionaisDisponiveis.length === 1) {
                     encaminharParaProfissional(chatId, profissionaisDisponiveis[0]);
-                    delete agendamentos[chatId];
                 } else {
                     client.sendMessage(chatId, `Escolha a profissional desejada para ${agendamentos[chatId].categoria}:\n` +
                         profissionaisDisponiveis.map((prof, i) => `${i + 1} - ${prof}`).join('\n') +
@@ -135,33 +132,46 @@ Digite "Voltar" para retornar.`);
             }
             break;
 
+
         case 3:
             const profissionalIndex = parseInt(msg.body) - 1;
             const profissionaisEscolhidos = profissionais[agendamentos[chatId].categoria];
 
             if (profissionalIndex >= 0 && profissionalIndex < profissionaisEscolhidos.length) {
-                encaminharParaProfissional(chatId, profissionaisEscolhidos[profissionalIndex]);
-                delete agendamentos[chatId];
+                const profissional = profissionaisEscolhidos[profissionalIndex];
+                encaminharParaProfissional(chatId, profissional);
             } else {
                 client.sendMessage(chatId, 'Escolha inválida. Tente novamente.');
             }
+            break;
+
+        case 4: // Nova etapa para capturar a disponibilidade do cliente
+            agendamentos[chatId].disponibilidade = msg.body;
+            client.sendMessage(chatId, "Obrigado! Sabrina entrará em contato com você em breve.");
+            delete agendamentos[chatId]; // Remove o agendamento após registrar a resposta
             break;
     }
 });
 
 function encaminharParaProfissional(chatId, profissional) {
-    const contatos = {
-        "Sabrina": "https://wa.me/5528999551316",
-        "Maíra": "https://wa.me/5528999435647",
-        "Juliana": "https://wa.me/5528999551316",
-        "Arielly": "https://wa.me/5528999895626"
-    };
-
-    if (contatos[profissional]) {
-        client.sendMessage(chatId, `Para agendamentos com ${profissional}, entre em contato pelo WhatsApp: ${contatos[profissional]}`);
+    if (profissional === "Sabrina") {
+        // Se o cliente escolher a Sabrina, perguntamos a disponibilidade
+        client.sendMessage(chatId, "Por favor, informe sua disponibilidade (dia e horário desejado).");
+        agendamentos[chatId].etapa = 4;
     } else {
-        client.sendMessage(chatId, "Profissional não encontrada. Tente novamente.");
+        const contatos = {
+            "Maíra": "https://wa.me/5528999435647",
+            "Juliana": "https://wa.me/5528999551316",
+            "Arielly": "https://wa.me/5528999895626"
+        };
+
+        if (contatos[profissional]) {
+            client.sendMessage(chatId, `Para agendamentos com ${profissional}, entre em contato pelo WhatsApp: ${contatos[profissional]}`);
+        } else {
+            client.sendMessage(chatId, "Profissional não encontrada. Tente novamente.");
+        }
     }
 }
+
 
 client.initialize();
