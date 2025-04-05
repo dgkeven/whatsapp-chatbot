@@ -47,6 +47,18 @@ client.on('ready', () => {
 client.on('message', async msg => {
     const chatId = msg.from;
 
+    // Se a mensagem foi enviada pelo próprio operador, encerra o atendimento automaticamente
+    if (!msg.fromMe && agendamentos[chatId]) {
+        agendamentos[chatId].operadorAtendeu = false; // Garante que o cliente ainda está sendo atendido
+    }
+
+    if (msg.fromMe && agendamentos[chatId]) {
+        // Mensagem enviada pelo operador → Encerra o atendimento automaticamente
+        delete agendamentos[chatId];
+        console.log(`Atendimento encerrado manualmente para ${chatId}`);
+        return;
+    }
+
     if (msg.body.toLowerCase() === 'serviços') {
         client.sendMessage(chatId, `Aqui estão nossos serviços disponíveis:\n${Object.keys(servicos).map(categoria => {
             return `\n${categoria}:\n${servicos[categoria].map(s => `${s.nome} - ${s.valor}`).join('\n')}`;
